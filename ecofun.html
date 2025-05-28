@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UPCYCLE KINGDOM Pay with Card</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      padding: 20px;
+      text-align: center;
+    }
+    .container {
+      max-width: 400px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    button {
+      background-color: #0070f3;
+      color: white;
+      border: none;
+      padding: 10px;
+      margin-top: 20px;
+      cursor: pointer;
+      border-radius: 5px;
+      width: 100%;
+    }
+    button:hover {
+      background-color: #005bb5;
+    }
+    #payment-message {
+      margin-top: 15px;
+      color: green;
+    }
+  </style>
+  <script src="https://js.stripe.com/v3/"></script>
+</head>
+body
+{background - color:#008000;}
+<H2>Welcome to Our Sustainable Theme Park Project!</H2>
+<P>
+Imagine a place full of fun, adventure, and excitement — now imagine it built in harmony with nature! </P>
+
+<P>Our project presents a unique Sustainable Theme Park, where every ride, building, and attraction is designed to reduce environmental impact and promote green living.</P>
+
+<P>Through this project, we aim to:</P>
+
+<P aligh="left">🌍 Raise awareness about sustainability in entertainment spaces</P>
+
+<P aligh="left">🔋 Incorporate renewable energy (like solar or wind) for park operations</P>
+
+<P aligh="left">🚮 Promote zero-waste strategies and eco-friendly materials</P>
+
+<P aligh="left">🌿 Design green spaces, water-saving systems, and biodiversity zones</P>
+
+<P aligh="left">♻️ Educate visitors on protecting the planet — while having fun!</P>
+  <div class="container">
+    <h2>Pay $10</h2>
+
+    <form id="payment-form">
+      <div id="card-element" style="margin-top: 20px;"></div>
+      <button onclick="window.location.href='qr code.html'">Pay Now</button>
+      <div id="payment-message"></div>
+    </form>
+  </div>
+
+  <script>
+    const stripe = Stripe("pk_test_YOUR_PUBLISHABLE_KEY"); // Replace with your Stripe publishable key
+    const elements = stripe.elements();
+    const card = elements.create("card");
+    card.mount("#card-element");
+
+    const form = document.getElementById("payment-form");
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const res = await fetch("http://localhost:4242/create-payment-intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      });
+
+      const { clientSecret } = await res.json();
+
+      const result = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: card
+        }
+      });
+
+      const message = document.getElementById("payment-message");
+      if (result.error) {
+        message.textContent = result.error.message;
+      } else if (result.paymentIntent.status === 'succeeded') {
+        message.textContent = "Payment successful!";
+      }
+    });
+  </script>
+
+ 
+</body>
+</html>
